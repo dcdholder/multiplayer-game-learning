@@ -6,17 +6,21 @@
   <body style="margin:0px;">
     <div style="display:flex;width:100vw;height:60vh;align-items:center;justify-content:center;margin:0px;">
       <div style="width:400px;border:2px solid black;border-radius:10px;">
-          <div style="text-align:center;border-bottom:2px solid black;">
-              <h2>OGame Clone</h2>
-          </div>
+        <div style="margin:auto;display:flex;justify-content:center;">
+          <img src="{{imagesUrl}}{{marsImageFilename}}" alt="Mars" style="width:100px;height:100px;margin:10px">
+        </div>
 
-          <div style="margin:auto;display:flex;justify-content:center;margin:10px;">
-            <b>Username:</b>&nbsp&nbsp<input type="text" name="username" id="username">
-            &nbsp
-            <button type="button" onClick="login(document.getElementById('username').value)" style="background-color:lightgreen">Login</button>
-            &nbsp
-            <button type="button" onClick="register(document.getElementById('username').value)" style="background-color:lightblue">Register</button>
-          </div>
+        <div style="text-align:center;border-bottom:2px solid black;">
+            <h2>OGame Clone</h2>
+        </div>
+
+        <div style="margin:auto;display:flex;justify-content:center;margin:10px;">
+          <b>Username:</b>&nbsp&nbsp<input type="text" name="username" id="username">
+          &nbsp
+          <button type="button" onClick="login(document.getElementById('username').value)" style="background-color:lightgreen">Login</button>
+          &nbsp
+          <button type="button" onClick="register(document.getElementById('username').value)" style="background-color:lightblue">Register</button>
+        </div>
       </div>
     </div>
   </body>

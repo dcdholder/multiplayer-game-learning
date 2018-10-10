@@ -24,7 +24,10 @@ server.route({
       registrationEndpoint: '/players/create',
 
       gameFrontendUrl:      server.info.uri,
-      gameFrontendEndpoint: '/game'
+      gameFrontendEndpoint: '/game',
+
+      imagesUrl:         server.info.uri + '/images/',
+      marsImageFilename: 'mars.png'
     };
 
     return h.view('index', context);
@@ -91,6 +94,16 @@ async function start() {
       html: require('handlebars')
     },
     path: 'login'
+  });
+
+  server.route({
+    method: 'GET',
+    path:   '/images/{params}',
+    handler: {
+      directory: {
+        path: 'login/images'
+      }
+    }
   });
 
   try {
