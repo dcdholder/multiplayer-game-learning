@@ -20,6 +20,14 @@ server.route({
 });
 
 server.route({
+  method: 'GET',
+  path:   '/game/{player}',
+  handler: (req,h) => {
+    return server.info.uri;
+  }
+});
+
+server.route({
   method: 'POST',
   path:   '/players/create',
   handler: (req,h) => {
