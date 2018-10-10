@@ -6,16 +6,28 @@ const config   = require('./config.json');
 const Universe = require('./ogame.js');
 const universe = new Universe(config);
 
+let host = 'localhost';
+let port = '8000';
+
 const server = Hapi.server({
-  host: 'localhost',
-  port: '8000'
+  host:   host,
+  port:   port,
+  routes: {cors: {origin: ['http://' + host]}}
 });
 
 server.route({
   method: 'GET',
   path:   '/',
   handler: (req,h) => {
-    return h.file('./login/index.html');
+    let context = {
+      authUrl:              server.info.uri,
+      registrationEndpoint: '/players/create',
+
+      gameFrontendUrl:      server.info.uri,
+      gameFrontendEndpoint: '/game'
+    };
+
+    return h.view('index', context);
   }
 });
 
@@ -23,7 +35,11 @@ server.route({
   method: 'GET',
   path:   '/game/{player}',
   handler: (req,h) => {
-    return server.info.uri;
+    if (universe.players[req.params.player]) {
+      return "Welcome back, " + req.params.player + ".";
+    } else {
+      return "Register first.";
+    }
   }
 });
 
@@ -64,6 +80,17 @@ server.route({
 async function start() {
   await server.register({
     plugin: require('inert')
+  });
+
+  await server.register({
+    plugin: require('vision')
+  });
+
+  server.views({
+    engines: {
+      html: require('handlebars')
+    },
+    path: 'login'
   });
 
   try {
