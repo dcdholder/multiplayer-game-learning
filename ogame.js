@@ -5,24 +5,16 @@ class Universe {
     this.players = {};
   }
 
-  static get TICK_LENGTH()          { return 1000; }
-  static get TICK_LENGTH_IN_HOURS() { return Universe.TICK_LENGTH / 1000 / 3600; }
+  static get MILLISECONDS_IN_HOUR() { return 60 * 60 * 1000; }
 
-  run() {
-    setInterval(() => {this.tick();},Universe.TICK_LENGTH);
-  }
+  static get TICK_LENGTH()          { return 1000; }
+  static get TICK_LENGTH_IN_HOURS() { return Universe.TICK_LENGTH / Universe.MILLISECONDS_IN_HOUR; }
 
   addPlayer(name) {
     if (!this.players[name]) {
       this.players[name] = new Player(name,this.config.buildingTypes,this.config.params);
     } else {
       throw new Error("Player with that name already exists.");
-    }
-  }
-
-  tick() {
-    for (let player of Object.values(this.players)) {
-      player.tick();
     }
   }
 }
@@ -37,8 +29,20 @@ class Player {
     this.defaultResourceRate = params.defaultResourceRate;
     this.resources           = params.startingResources;
 
+    this.startBasicIncome();
+
     this.energyOutput  = 0;
     this.energyBalance = 0;
+  }
+
+  startBasicIncome() {
+    setInterval(() => {this.receiveBasicIncome();}, Universe.TICK_LENGTH);
+  }
+
+  receiveBasicIncome() {
+    for (let resource in this.defaultResourceRate) {
+      this.resources[resource] += this.defaultResourceRate[resource] * Universe.TICK_LENGTH_IN_HOURS;
+    }
   }
 
   canAfford(costs) {
@@ -115,16 +119,6 @@ class Player {
 
     return state;
   }
-
-  tick() {
-    for (let resource in this.defaultResourceRate) {
-      this.resources[resource] += this.defaultResourceRate[resource] * Universe.TICK_LENGTH_IN_HOURS;
-    }
-
-    for (let buildingType in this.buildings) {
-      this.buildings[buildingType].tick();
-    }
-  }
 }
 
 class Building {
@@ -135,12 +129,28 @@ class Building {
 
     this.upgrading = true;
     this.startUpgradeTimer();
+    if (this.buildingType.income) {
+      this.startMining();
+    }
 
     this.energy = 0;
   }
 
+  static get UPGRADE_TIME_DIVISOR() { return 2500; }
+
   startUpgradeTimer() {
-    this.constructionEndTime = new Date(Date.now() + this.constructionTime() * 3600 * 1000);
+    setTimeout(() => {this.upgrading=false; this.upgrade();}, this.constructionTime() * Universe.MILLISECONDS_IN_HOUR);
+  }
+
+  startMining() {
+    setInterval(() => {this.givePlayerResources();}, Universe.TICK_LENGTH);
+  }
+
+  givePlayerResources() {
+    let resourceRates = this.rate();
+    for (let resource in resourceRates) {
+      this.player.resources[resource] += resourceRates[resource] * Universe.TICK_LENGTH_IN_HOURS;
+    }
   }
 
   upgrade() {
@@ -160,7 +170,7 @@ class Building {
       }
     }
 
-    let baseTime = metalCrystalCost / 25000;
+    let baseTime = metalCrystalCost / Building.UPGRADE_TIME_DIVISOR;
 
     return baseTime;
   }
@@ -248,20 +258,6 @@ class Building {
     }
 
     return rates;
-  }
-
-  tick() {
-    if (this.upgrading && Date.now()>=this.constructionEndTime) {
-      this.upgrading = false;
-      this.upgrade();
-    }
-
-    if (this.buildingType.income) {
-      let resourceRates = this.rate();
-      for (let resource in resourceRates) {
-        this.player.resources[resource] += resourceRates[resource] * Universe.TICK_LENGTH_IN_HOURS;
-      }
-    }
   }
 }
 

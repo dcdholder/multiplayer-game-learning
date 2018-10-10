@@ -5,7 +5,6 @@ const config   = require('./config.json');
 const Hapi     = require('hapi');
 
 const universe = new Universe(config);
-universe.run();
 
 const server = Hapi.server({
   host: 'localhost',
