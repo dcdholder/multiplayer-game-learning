@@ -1,9 +1,9 @@
 'use strict';
 
-const Universe = require('./ogame.js');
-const config   = require('./config.json');
-const Hapi     = require('hapi');
+const Hapi = require('hapi');
 
+const config   = require('./config.json');
+const Universe = require('./ogame.js');
 const universe = new Universe(config);
 
 const server = Hapi.server({
@@ -15,7 +15,7 @@ server.route({
   method: 'GET',
   path:   '/',
   handler: (req,h) => {
-    return server.info.uri;
+    return h.file('./login/index.html');
   }
 });
 
@@ -62,6 +62,10 @@ server.route({
 });
 
 async function start() {
+  await server.register({
+    plugin: require('inert')
+  });
+
   try {
     await server.start();
   } catch (err) {
