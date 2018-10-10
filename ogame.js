@@ -1,7 +1,3 @@
-//TODO: create an API to expose upgrade etc. functions
-
-let config = require("./config.json");
-
 class Universe {
   constructor(config) {
     this.config = config;
@@ -9,7 +5,7 @@ class Universe {
     this.players = {};
   }
 
-  static get TICK_LENGTH() { return 1000; }
+  static get TICK_LENGTH()          { return 1000; }
   static get TICK_LENGTH_IN_HOURS() { return Universe.TICK_LENGTH / 1000 / 3600; }
 
   run() {
@@ -17,7 +13,11 @@ class Universe {
   }
 
   addPlayer(name) {
-    this.players[name] = new Player(name,this.config.buildingTypes,this.config.params);
+    if (!this.players[name]) {
+      this.players[name] = new Player(name,this.config.buildingTypes,this.config.params);
+    } else {
+      throw new Error("Player with that name already exists.");
+    }
   }
 
   tick() {
@@ -74,10 +74,44 @@ class Player {
     }
   }
 
-  tick() {
-    console.log(this.resources);
-    console.log(this.energyBalance);
+  getBuildingLevels() {
+    let buildingLevels = {};
 
+    for (let buildingType in this.buildings) {
+      buildingLevels[buildingType] = this.buildings[buildingType].level;
+    }
+
+    return buildingLevels;
+  }
+
+  getResourceRate() {
+    let rates = this.defaultResourceRate;
+
+    for (let buildingType in this.buildings) {
+      let rate  = this.buildings[buildingType].rate();
+
+      for (let resource in rate) {
+        rates[resource] += rate[resource];
+      }
+    }
+
+    return rates;
+  }
+
+  getState() {
+    let state = {
+      buildings:    this.getBuildingLevels(),
+      resources:    this.resources,
+      resourceRate: this.getResourceRate(),
+
+      energyOutput:  this.energyOutput,
+      energyBalance: this.energyBalance
+    }
+
+    return state;
+  }
+
+  tick() {
     for (let resource in this.defaultResourceRate) {
       this.resources[resource] += this.defaultResourceRate[resource] * Universe.TICK_LENGTH_IN_HOURS;
     }
@@ -176,22 +210,16 @@ class Building {
     let initial = this.buildingType.income.initial;
     let base    = this.buildingType.income.base;
 
-    //console.log(initial);
-    //console.log(base);
-
     let rates = {};
     for (let resource in initial) {
       rates[resource] = initial[resource] * this.level * Math.pow(base,this.level) * this.rateEnergyFactor();
     }
-
-    //console.log(this.rateEnergyFactor());
 
     return rates;
   }
 
   tick() {
     if (this.buildingType.income) {
-      console.log(this.rate());
       let resourceRates = this.rate();
       for (let resource in resourceRates) {
         this.player.resources[resource] += resourceRates[resource] * Universe.TICK_LENGTH_IN_HOURS;
@@ -200,11 +228,4 @@ class Building {
   }
 }
 
-let universe = new Universe(config);
-universe.run();
-universe.addPlayer("test");
-universe.players.test.upgrade("Solar Plant");
-universe.players.test.upgrade("Metal Mine");
-universe.players.test.upgrade("Metal Mine");
-universe.players.test.upgrade("Solar Plant");
-universe.players.test.upgrade("Metal Mine");
+module.exports = Universe;
