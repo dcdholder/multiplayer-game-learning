@@ -67,7 +67,12 @@ class Player {
       let cost     = building.upgradeCost();
 
       this.pay(cost);
-      building.upgrade();
+
+      if (!building.upgrading) {
+        building.upgrade();
+      } else {
+        throw new Error("Building already upgrading");
+      }
     } else {
       this.pay(this.buildingTypes[buildingType].cost.initial);
       this.buildings[buildingType] = new Building(this.buildingTypes[buildingType],this);
@@ -126,16 +131,38 @@ class Building {
   constructor(buildingType,player) {
     this.buildingType = buildingType;
     this.player       = player;
-    this.level        = 1;
+    this.level        = 0;
+
+    this.upgrading = true;
+    this.startUpgradeTimer();
 
     this.energy = 0;
-    this.adjustEnergy();
+  }
+
+  startUpgradeTimer() {
+    this.constructionEndTime = new Date(Date.now() + this.constructionTime() * 3600 * 1000);
   }
 
   upgrade() {
     this.level++;
 
     this.adjustEnergy();
+  }
+
+  //time returned in hours
+  constructionTime() {
+    let upgradeCost = this.upgradeCost();
+
+    let metalCrystalCost = 0;
+    for (let resource in upgradeCost) {
+      if (resource=="metal" || resource=="crystal") {
+        metalCrystalCost += upgradeCost[resource];
+      }
+    }
+
+    let baseTime = metalCrystalCost / 25000;
+
+    return baseTime;
   }
 
   adjustEnergy() {
@@ -160,7 +187,10 @@ class Building {
 
     let cost = {};
     for (let resource in initial) {
-      cost[resource] = initial[resource] * Math.pow(base,this.level-1);
+      cost[resource] = initial[resource];
+      if (this.level!=0) {
+        cost[resource] *= Math.pow(base,this.level-1);
+      }
     }
 
     return cost;
@@ -211,14 +241,21 @@ class Building {
     let base    = this.buildingType.income.base;
 
     let rates = {};
-    for (let resource in initial) {
-      rates[resource] = initial[resource] * this.level * Math.pow(base,this.level) * this.rateEnergyFactor();
+    if (this.level!=0) {
+      for (let resource in initial) {
+        rates[resource] = initial[resource] * this.level * Math.pow(base,this.level) * this.rateEnergyFactor();
+      }
     }
 
     return rates;
   }
 
   tick() {
+    if (this.upgrading && Date.now()>=this.constructionEndTime) {
+      this.upgrading = false;
+      this.upgrade();
+    }
+
     if (this.buildingType.income) {
       let resourceRates = this.rate();
       for (let resource in resourceRates) {
