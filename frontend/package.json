@@ -1,0 +1,16 @@
+{
+  "name": "ogame-clone-frontend",
+  "version": "0.0.0",
+  "description": "Serves game templates/images.",
+  "main": "server.js",
+  "author": "Dallas Holder",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "hapi": "^17.6.0",
+    "inert": "^5.1.0",
+    "vision": "^5.4.0",
+    "handlebars": "^4.0.12",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.5"
+  }
+}

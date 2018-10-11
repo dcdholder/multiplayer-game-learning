@@ -1,0 +1,11 @@
+{
+  "name": "ogame-clone-backend",
+  "version": "0.0.0",
+  "description": "Game logic.",
+  "main": "server.js",
+  "author": "Dallas Holder",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "hapi": "^17.6.0"
+  }
+}
