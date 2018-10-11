@@ -34,7 +34,7 @@
   }
 
   function register(username) {
-    let registrationUrl = "{{authUrl}}{{registrationEndpoint}}";
+    let registrationUrl = "http://" + window.location.hostname + ":{{authPort}}{{registrationEndpoint}}";
 
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = () => {

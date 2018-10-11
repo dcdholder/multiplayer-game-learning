@@ -1,16 +1,13 @@
 version: '3'
 services:
   backend:
-    environment:
-      - FRONTEND_URL=http://frontend:8000
     build: ./backend
     ports:
       - "8001:8001"
 
   frontend:
     environment:
-      - BACKEND_URL=http://backend:8001
-      - BACKEND_IP=http://0.0.0.0:8001 #needed to allow frontend HTML to contact backend
+      - BACKEND_INTERNAL_URL=http://backend:8001
     build: ./frontend
     ports:
       - "8000:8000"

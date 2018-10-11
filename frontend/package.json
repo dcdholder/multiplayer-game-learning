@@ -5,6 +5,8 @@
   "main": "server.js",
   "author": "Dallas Holder",
   "license": "UNLICENSED",
+  "repository": "https://github.com/dcdholder/multiplayer-game-learning",
+  
   "dependencies": {
     "hapi": "^17.6.0",
     "inert": "^5.1.0",

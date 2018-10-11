@@ -6,8 +6,11 @@ const request = require('request-promise-native');
 let host = '0.0.0.0';
 let port = '8000';
 
-const backendUrl = process.env.BACKEND_URL;
-const authUrl    = process.env.BACKEND_IP;
+const backendUrl  = process.env.BACKEND_INTERNAL_URL;
+const backendPort = backendUrl.split(":").slice(-1)[0]; //backend port is needed for the views to access the backend
+
+const authUrl  = backendUrl;
+const authPort = backendPort;
 
 const server = Hapi.server({
   host:   host,
@@ -37,7 +40,7 @@ async function start() {
     path:   '/',
     handler: (req,h) => {
       let context = {
-        authUrl:              authUrl,
+        authPort:             authPort,
         registrationEndpoint: '/players/create',
 
         gameFrontendUrl:      server.info.uri,
