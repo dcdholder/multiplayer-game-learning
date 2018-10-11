@@ -4,7 +4,7 @@ const Hapi    = require('hapi');
 const request = require('request-promise-native');
 
 let host = '0.0.0.0';
-let port = '8000';
+let port = '80';
 
 const backendUrl  = process.env.BACKEND_INTERNAL_URL;
 const backendPort = backendUrl.split(":").slice(-1)[0]; //backend port is needed for the views to access the backend
@@ -43,7 +43,6 @@ async function start() {
         authPort:             authPort,
         registrationEndpoint: '/players/create',
 
-        gameFrontendUrl:      server.info.uri,
         gameFrontendEndpoint: '/game',
 
         imagesUrl:         server.info.uri + '/images/',

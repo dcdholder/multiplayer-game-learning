@@ -28,7 +28,7 @@
 
 <script type="text/javascript">
   function login(username) {
-    let redirectUrl = "{{gameFrontendUrl}}{{gameFrontendEndpoint}}/" + username;
+    let redirectUrl = "http://" + window.location.hostname + "{{gameFrontendEndpoint}}/" + username;
 
     window.location.href = redirectUrl; //for now this is just a redirect, no auth required
   }

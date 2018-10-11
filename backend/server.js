@@ -7,7 +7,7 @@ const Universe = require('./ogame.js');
 const universe = new Universe(config);
 
 let host = '0.0.0.0';
-let port = '8001';
+let port = '8000';
 
 const frontendUrl = process.env.FRONTEND_URL;
 
