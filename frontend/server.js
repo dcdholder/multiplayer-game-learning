@@ -3,16 +3,16 @@
 const Hapi    = require('hapi');
 const request = require('request-promise-native');
 
-let host = 'localhost';
+let host = '0.0.0.0';
 let port = '8000';
 
-const backendUrl = 'http://localhost:8001';
-const authUrl    = backendUrl;
+const backendUrl = process.env.BACKEND_URL;
+const authUrl    = process.env.BACKEND_IP;
 
 const server = Hapi.server({
   host:   host,
   port:   port,
-  routes: {cors: {origin: ['http://' + host]}}
+  routes: {cors: true}
 });
 
 async function start() {
